@@ -16,15 +16,60 @@ What's inside:
 
 ---
 
+## The standards we hold to
+
+This kit holds an integration to four external, authoritative standards — not house rules.
+Everything in `AUDIT.md` and the CI gate traces back to one of these:
+
+### 1. The Integration Quality Scale (HA's built-in tiers)
+
+Home Assistant's official, four-tier grading system for integrations, defined in
+[ADR 0022](https://github.com/home-assistant/architecture/blob/master/adr/0022-integration-quality-scale.md)
+and published as a [rules index](https://developers.home-assistant.io/docs/core/integration-quality-scale/rules).
+Each tier is a set of **concrete, testable rules**; a tier is achieved only when every rule
+in it *and all lower tiers* is satisfied or justified N/A. You declare the tier you've
+reached in `manifest.json`'s `quality_scale` field.
+
+| Tier | Theme | Representative rules |
+|---|---|---|
+| 🥉 **Bronze** | baseline correctness | `config-flow`, `entity-unique-id`, `runtime-data`, `test-before-setup` |
+| 🥈 **Silver** | robustness | `entity-unavailable`, `reauthentication-flow`, `config-entry-unloading`, `test-coverage` |
+| 🥇 **Gold** | polish & UX | `devices`, `diagnostics`, `discovery`, entity/exception/icon translations, `reconfiguration-flow`, `repair-issues` |
+| 🏆 **Platinum** | engineering excellence | `async-dependency`, `inject-websession`, `strict-typing` |
+
+### 2. Architecture Decision Records (ADRs)
+
+HA's canonical, versioned record of **why** the platform's rules exist — the rationale and
+constraints behind integration design (config via UI not YAML, code owners, translations
+2.0, "discovery requires a unique id", the quality scale itself). They're the authority you
+cite when a design choice is questioned. Full index:
+[home-assistant/architecture](https://github.com/home-assistant/architecture/tree/master/adr).
+
+### 3. HACS publishing standards
+
+The [Home Assistant Community Store](https://www.hacs.xyz/docs/publish/integration/) has its
+own requirements for a repo to be installable and listed: a valid `hacs.json`, the
+integration under `custom_components/<domain>/` with a complete `manifest.json`, a README, a
+GitHub release/topic, and brand assets submitted to
+[`home-assistant/brands`](https://github.com/home-assistant/brands). The `hacs/action`
+GitHub Action validates these in CI.
+
+### 4. hassfest
+
+HA core's own validator for `manifest.json`, `strings.json`, `services.yaml`, and
+translations — it enforces that they're well-formed and internally consistent. Run via the
+`home-assistant/actions/hassfest` action. Reference:
+[manifest docs](https://developers.home-assistant.io/docs/creating_integration_manifest).
+
+**In short:** `AUDIT.md` tracks your progress against the **Quality Scale + ADRs**; the CI
+workflows enforce **HACS + hassfest** (plus strict lint/type/test). The rest of this README
+shows exactly where the kit *meets* these standards and where it deliberately *exceeds* them.
+
+---
+
 ## What the quality audit + ADRs provide
 
-Home Assistant grades integrations on a four-tier **Integration Quality Scale**
-(Bronze → Silver → Gold → Platinum) — concrete, testable rules like "every entity has a
-`unique_id`" or "raise `ConfigEntryNotReady` on a failed setup". The **Architecture
-Decision Records (ADRs)** are HA's canonical *rationale* for the design rules (config via
-UI, code owners, translations 2.0, the quality scale itself).
-
-`AUDIT.md` turns both into a single living checklist: every rule, a status, and a one-line
+`AUDIT.md` turns the Quality Scale and ADRs into a single living checklist: every rule, a status, and a one-line
 note — plus an honest **"ignored / N-A" register** so each skipped rule has a recorded
 reason and a revisit trigger. Example (Bronze excerpt):
 
