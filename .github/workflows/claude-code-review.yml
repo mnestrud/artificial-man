@@ -1,0 +1,34 @@
+name: Claude Code Review
+
+# AI-in-CI: Claude reviews every pull request automatically and posts a comment.
+#
+# OPT-IN: this workflow is inert until you add an `ANTHROPIC_API_KEY` repository
+# secret (Settings -> Secrets and variables -> Actions). Each run is billed to
+# that Anthropic API account. Remove this file if you don't want it.
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request for a Home Assistant custom integration.
+            Focus on: correctness and async/event-loop safety, HA entity/coordinator
+            API misuse, missing or wrong unique_id/has-entity-name/runtime-data,
+            unhandled error paths, and test coverage gaps. Be concise; flag concrete
+            issues with file:line references. Skip nits already caught by ruff/mypy.
+          claude_args: |
+            --max-turns 12

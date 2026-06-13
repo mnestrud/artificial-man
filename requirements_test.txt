@@ -1,0 +1,10 @@
+# Test/lint toolchain. PIN these — the HA test harness moves fast and unpinned
+# versions are the #1 cause of "passes locally, fails CI" drift.
+#
+#   pytest-homeassistant-custom-component — bundles a matching Home Assistant +
+#     pytest plugins. Pick the release that matches the HA version you target
+#     (see https://github.com/MatthewFlamm/pytest-homeassistant-custom-component).
+#   mypy / ruff — pin so the strict gate is reproducible across machines and CI.
+pytest-homeassistant-custom-component==0.13.316
+mypy==1.20.2
+ruff==0.15.16

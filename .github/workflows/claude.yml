@@ -1,0 +1,36 @@
+name: Claude Assistant
+
+# AI-in-CI: mention `@claude` in an issue or PR comment (or assign/label an issue)
+# and Claude responds in-thread — it can answer questions and push commits / open
+# a PR to address the request.
+#
+# OPT-IN: inert until you add an `ANTHROPIC_API_KEY` repository secret (Settings ->
+# Secrets and variables -> Actions). Each run is billed to that Anthropic API
+# account. Remove this file if you don't want it.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned, labeled]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude"

@@ -1,0 +1,57 @@
+# Quality gate config for a Home Assistant custom integration.
+# Rationale + per-rule sourcing live in AUDIT.md. Enforced by
+# .github/workflows/validate.yml (ruff -> mypy -> pytest).
+#
+# RENAME: replace every `<your_domain>` below with your integration's domain
+# (the folder name under custom_components/, e.g. `my_integration`).
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
+[tool.ruff.lint]
+# Curated strict select — deliberately well beyond HA's minimal baseline.
+# Each group earns its place; see AUDIT.md "Ruff config — above & beyond".
+select = [
+    "E", "W", "F",   # pycodestyle + pyflakes (the common baseline)
+    "I",             # isort (import order)
+    "UP",            # pyupgrade (modern syntax for the target Python)
+    "B",             # flake8-bugbear (likely bugs)
+    "ASYNC",         # async pitfalls — blocking calls in async (HA is async-first)
+    "C90",           # mccabe complexity
+    "N",             # pep8-naming
+    "D",             # pydocstyle (HA expects module/class docstrings)
+    "S",             # flake8-bandit (security)
+    "DTZ",           # flake8-datetimez (tz-aware datetimes — scheduling correctness)
+    "G",             # flake8-logging-format (lazy %, no f-strings in log calls)
+    "LOG",           # flake8-logging
+    "T20",           # flake8-print (no stray print)
+    "SIM",           # flake8-simplify
+    "RET",           # flake8-return
+    "TC",            # flake8-type-checking
+    "TID",           # flake8-tidy-imports
+    "PTH",           # flake8-use-pathlib
+    "RUF",           # ruff-specific
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.mccabe]
+# Keep the coordinator (and friends) from growing a monster method.
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "D", "SLF001"]   # asserts + docstrings + private access OK in tests
+"scripts/*" = ["T20"]                 # dev utilities may print to stdout
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# -p no:socket fails the suite on any un-mocked network call.
+# --cov-fail-under=95 is the gate; raise it as your coverage climbs.
+addopts = "-p no:socket --cov=custom_components/<your_domain> --cov-report=term-missing --cov-fail-under=95"
