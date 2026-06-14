@@ -95,7 +95,7 @@ Status legend: ✅ done · 🔜 design-time · 🛠 polish-time · ⬜ todo · �
 
 ---
 
-## Ruff config — above & beyond HA's baseline
+## Ruff config
 
 The common baseline is `E`/`F`/`W`. `pyproject.toml` selects a curated strict set on top of
 it — each group earns its place for an async, event-loop-driven integration:
@@ -115,7 +115,7 @@ Plus `mypy --strict` and a `--cov-fail-under=95` pytest gate.
 
 ---
 
-## How we meet HA standards — and where we exceed them
+## How we meet HA standards
 
 | Gate | HA / HACS baseline | This kit | Verdict |
 |---|---|---|---|
